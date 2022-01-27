@@ -1,4 +1,5 @@
 let allEvents = [];
+
 function getAllDeliveries() {
     return new Promise((resolve) => {
         allEvents = [];
@@ -14,6 +15,7 @@ function getAllDeliveries() {
         })
     })
 }
+
 function isValidDelivery(eventId) {
     return new Promise((resolve) => {
         axios.get(`https://api.poap.xyz/delivery/${eventId}`).then(res => {
@@ -27,6 +29,7 @@ function isValidDelivery(eventId) {
         })
     })
 }
+
 function claim(event, address) {
     return new Promise((resolve) => {
         axios.post(`https://api.poap.xyz/actions/claim-delivery-v2`, {
@@ -71,7 +74,7 @@ function getQueueIdStatus(event, queueId) {
 }
 
 function getMyDeliveries(event, address) {
-    axios.get(`https://anyplace-cors.herokuapp.com/https://api.poap.xyz/delivery-addresses/${event.id}/address/${address}`).then(async (res) => {
+    axios.get(`https://api.poap.xyz/delivery-addresses/${event.id}/address/${address}`).then(async(res) => {
         let isClaimed = res.data.claimed;
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
@@ -81,7 +84,7 @@ function getMyDeliveries(event, address) {
             let isValid = await isValidDelivery(event.id);
             let current = new Date();
             if (current > startDate && current < expiryDate && isValid) {
-                let queueId = await claim(event, address);
+                let queueId = await claim(event, res.data.address);
                 await getQueueIdStatus(event, queueId);
                 const status = setInterval(async function checkStatus() {
                     let isCompleted = await getQueueIdStatus(event, queueId);
@@ -97,10 +100,10 @@ function getMyDeliveries(event, address) {
     })
 }
 
-$(document).ready(function () {
-    $('#claimButton').submit(async function (e) {
+$(document).ready(function() {
+    $('#claimButton').submit(async function(e) {
         e.preventDefault();
-        let address = $('#address').val().trim();
+        let address = $('#address').val().toLowerCase().trim();
         if (!address) {
             alert("Please Enter Ethereum Address or ENS Name!");
             $("#address").focus();
