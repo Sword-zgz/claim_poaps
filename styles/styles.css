@@ -7,16 +7,18 @@ body {
 }
 
 .box-part {
-    background   : #FFF;
+    background: #FFF;
     border-radius: 0;
-    padding      : 60px 10px;
-    margin       : 30px 0px;
+    padding: 60px 10px;
+    margin: 30px 0px;
 }
+
 .badge {
     position: absolute;
-    top     : 30px;
-    right   : 15px;
+    top: 30px;
+    right: 15px;
 }
+
 .text {
     margin: 20px 0px;
 }
@@ -32,8 +34,8 @@ body {
 .form-control-borderless:hover,
 .form-control-borderless:active,
 .form-control-borderless:focus {
-    border    : none;
-    outline   : none;
+    border: none;
+    outline: none;
     box-shadow: none;
 }
 
@@ -43,24 +45,24 @@ body {
 
 .title-header:before {
     border-top: 2px solid #4183D7;
-    content   : "";
-    left      : 0;
-    position  : absolute;
-    right     : 0;
-    top       : 50%;
+    content: "";
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 50%;
 }
 
 .title-header h5 {
-    background    : #fff;
-    color         : #363636;
-    display       : inline-block;
-    font-weight   : 600;
-    line-height   : 40px;
-    margin        : 0;
-    padding       : 0 30px;
-    position      : relative;
+    background: #fff;
+    color: #363636;
+    display: inline-block;
+    font-weight: 600;
+    line-height: 40px;
+    margin: 0;
+    padding: 0 30px;
+    position: relative;
     text-transform: uppercase;
-    border        : 2px solid #4183D7;
+    border: 2px solid #4183D7;
 }
 
 p {
@@ -68,10 +70,9 @@ p {
 }
 
 .blog-footer {
-    position: absolute;
+    margin-top: 400px;
     bottom: 0;
     width: 100%;
-    height: 3.5rem;  
+    height: 3.5rem;
     background-color: #f9f9f9;
-
 }
