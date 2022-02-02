@@ -16,14 +16,10 @@ function getAllDeliveries() {
     })
 }
 
-function isValidDelivery(eventId) {
+function isValidDelivery(slug) {
     return new Promise((resolve) => {
-        axios.get(`https://api.poap.xyz/delivery/${eventId}`).then(res => {
-            let claimedAddress = res.data.claimed_addresses;
-            if (claimedAddress > 0) {
-                resolve(true);
-            }
-            resolve(false)
+        axios.get(`https://anyplace-cors.herokuapp.com/https://poap.delivery/${slug}`).then(res => {
+            resolve(true)
         }).catch(err => {
             resolve(false);
         })
@@ -79,11 +75,8 @@ function getMyDeliveries(event, address) {
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
         if (!isClaimed) {
-            let startDate = new Date(res.data.events[0].start_date);
-            let expiryDate = new Date(res.data.events[0].expiry_date);
-            let isValid = await isValidDelivery(event.id);
-            let current = new Date();
-            if (current > startDate && current < expiryDate && isValid) {
+            let isValid = await isValidDelivery(event.slug);
+            if (isValid) {
                 let queueId = await claim(event, res.data.address);
                 await getQueueIdStatus(event, queueId);
                 const status = setInterval(async function checkStatus() {
