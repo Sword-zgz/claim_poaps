@@ -32,18 +32,6 @@ function claim(event, address) {
             address: address,
             id: event.id
         }).then(res => {
-            document.getElementById('deliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="box-part text-center">
-                    <span class="badge badge-primary">Just Claimed</span>
-                        <a href="https://poap.delivery/${event.slug}">
-                            <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
-                        </a>
-                        <div class="title">
-                            <h4>${event.card_title}</h4>
-                        </div>
-                        <div id='${event.id}'></div>
-                    </div>
-                </div>`
             resolve(res.data.queue_uid);
         }).catch(err => {
             resolve('');
@@ -77,6 +65,20 @@ function getMyDeliveries(event, address) {
         if (!isClaimed) {
             let isValid = await isValidDelivery(event.slug);
             if (isValid) {
+                document.getElementById('deliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="box-part text-center">
+                <span class="badge badge-primary">Just Claimed</span>
+                    <a href="https://poap.delivery/${event.slug}">
+                        <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
+                    </a>
+                    <div class="title">
+                        <h4>${event.card_title}</h4>
+                    </div>
+                    <div id='${event.id}'>
+                    <a href='https://poap.delivery/${event.slug}' target="_blank" class="btn btn-warning">CLAIMING</a>
+                    </div>
+                </div>
+            </div>`
                 let queueId = await claim(event, res.data.address);
                 await getQueueIdStatus(event, queueId);
                 const status = setInterval(async function checkStatus() {
