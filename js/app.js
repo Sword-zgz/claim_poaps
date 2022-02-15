@@ -1,6 +1,6 @@
 let allEvents = [];
 let hasPoapClaimed = false;
-let hasPoapClaimedDisplayed = false;
+// let hasPoapClaimedDisplayed = false;
 let hasRaffleDisplayed = false;
 function getAllDeliveries() {
     return new Promise((resolve) => {
@@ -33,12 +33,12 @@ function getAllRaffles(poaps, raffles = [], api = 'https://api-ro.poap.fun/api/v
         axios.get(api).then(res => {
             let page = res.data.next;
             if (page) {
-                console.log(page)
                 let results = res.data.results;
                 for (let result of results) {
                     let current = new Date();
                     let drawTime = new Date(result.draw_datetime);
-                    if (current < drawTime) {
+                    let name = result.name;
+                    if (current < drawTime && !name.toLowerCase().includes('please ignore') && !name.toLowerCase().includes('removed')) {
                         for (let event of result.events) {
                             if (poaps.includes(event.event_id)) {
                                 displayRaffle(result);
@@ -79,30 +79,6 @@ function claim(event, address) {
             address: address,
             id: event.id
         }).then(res => {
-            let header = `<div class="row mt-5">
-            <div class="col-md-12">
-                <div class="title-header text-center">
-                    <h5>Your Availabe POAP Deliveries</h5>
-                </div>
-            </div>
-        </div>
-        <div class="row" id="deliveries">`;
-            if (!hasPoapClaimedDisplayed) {
-                $('#deliveriesHeader').html(header);
-            }
-            document.getElementById('deliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="box-part text-center">
-                    <span class="badge badge-primary">Just Claimed</span>
-                        <a href="https://poap.delivery/${event.slug}">
-                            <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
-                        </a>
-                        <div class="title">
-                            <h4>${event.card_title}</h4>
-                        </div>
-                        <div id='${event.id}'></div>
-                    </div>
-                </div>`
-            hasPoapClaimedDisplayed = true;
             resolve(res.data.queue_uid);
         }).catch(err => {
             resolve('');
@@ -144,7 +120,7 @@ function displayRaffle(raffle) {
     document.getElementById('raffleCards').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
         <div class="box-part text-center">
             <a href="https://poap.fun/raffle/${raffle.id}">
-                <img src="https://cdn.pixabay.com/photo/2014/04/02/14/04/ticket-306087_960_720.png" style="width:100px;height:100px;border-radius: 50%;">
+                <img src="./images/raffle.png" style="width:100px;height:100px;border-radius: 50%;">
             </a>
             <div class="title">
                 <h4>${raffle.name}</h4>
@@ -162,6 +138,31 @@ function getMyDeliveries(event, address) {
         if (!isClaimed) {
             let isValid = await isValidDelivery(event.slug);
             if (isValid) {
+                if (!hasPoapClaimed) {
+                    $('#deliveriesHeader').html(`<div class="row mt-5">
+                <div class="col-md-12">
+                    <div class="title-header text-center">
+                        <h5>Your Availabe POAP Deliveries</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="deliveries">`);
+                }
+                document.getElementById('deliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="box-part text-center">
+                <span class="badge badge-primary">Just Claimed</span>
+                    <a href="https://poap.delivery/${event.slug}">
+                        <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
+                    </a>
+                    <div class="title">
+                        <h4>${event.card_title}</h4>
+                    </div>
+                    <div id='${event.id}'>
+                    <a href='https://poap.delivery/${event.slug}' target="_blank" class="btn btn-warning">CLAIMING</a>
+                    </div>
+                </div>
+            </div>`;
+                hasPoapClaimed = true;
                 let queueId = await claim(event, res.data.address);
                 await getQueueIdStatus(event, queueId);
                 const status = setInterval(async function checkStatus() {
@@ -172,31 +173,31 @@ function getMyDeliveries(event, address) {
                 }, 3000);
             }
         }
-        else {
-            if (!hasPoapClaimed) {
-                $('#claimed').html(`<div class="row mt-5">
-                 <div class="col-md-12">
-                     <div class="title-header text-center">
-                         <h5>Your Claimed POAP Deliveries</h5>
-                     </div>
-                 </div>
-             </div>
-             <div class="row" id="claimedDeliveries"></div>`)
-            }
-            document.getElementById('claimedDeliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" style="opacity:0.5">
-                    <div class="box-part text-center">
-                    <span class="badge badge-primary">claimed</span>
-                        <a href="https://poap.delivery/${event.slug}">
-                            <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
-                        </a>
-                        <div class="title">
-                            <h4>${event.card_title}</h4>
-                        </div>
-                        <div id='${event.id}'></div>
-                    </div>
-                </div>`;
-            hasPoapClaimed = true;
-        }
+        // else {
+        //     if (!hasPoapClaimedDisplayed) {
+        //         $('#claimed').html(`<div class="row mt-5">
+        //          <div class="col-md-12">
+        //              <div class="title-header text-center">
+        //                  <h5>Your Claimed POAP Deliveries</h5>
+        //              </div>
+        //          </div>
+        //      </div>
+        //      <div class="row" id="claimedDeliveries"></div>`)
+        //     }
+        //     document.getElementById('claimedDeliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" style="opacity:0.5">
+        //             <div class="box-part text-center">
+        //             <span class="badge badge-primary">claimed</span>
+        //                 <a href="https://poap.delivery/${event.slug}">
+        //                     <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
+        //                 </a>
+        //                 <div class="title">
+        //                     <h4>${event.card_title}</h4>
+        //                 </div>
+        //                 <div id='${event.id}'></div>
+        //             </div>
+        //         </div>`;
+        //         hasPoapClaimedDisplayed = true;
+        // }
     }).catch(err => {
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
@@ -205,7 +206,10 @@ function getMyDeliveries(event, address) {
 
 async function startRaffles(address) {
     let poaps = await getAllPoaps(address);
+    $('#checkRaffleMsg').html(`<p>Working hard to find the raffles you can join...</p>` );
     await getAllRaffles(poaps);
+    $('#checkRaffleMsg').html(`` );
+
 }
 async function startDeliveries(address) {
     let events = await getAllDeliveries();
@@ -224,8 +228,11 @@ $(document).ready(function () {
             return;
         }
         $('#deliveriesHeader').html('');
-        $('#claimed').html('');
+        // $('#claimed').html('');
         $('#raffles').html('');
+        hasPoapClaimed = false;
+        // hasPoapClaimedDisplayed = false;
+        hasRaffleDisplayed = false;
         $('#checkMsg').html(`<p>Checking...</p>`);
         startRaffles(address);
         startDeliveries(address);
