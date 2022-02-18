@@ -56,7 +56,7 @@ function getAllRaffles(poaps, raffles = [], api = 'https://anyplace-cors.herokua
                         }
                     }
                 }
-                getAllRaffles(poaps, raffles, page).then(resolve).catch(reject);;
+                getAllRaffles(poaps, raffles, "https://anyplace-cors.herokuapp.com/"+page).then(resolve).catch(reject);;
             } else {
                 resolve(true);
             }
