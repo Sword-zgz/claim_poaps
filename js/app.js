@@ -3,13 +3,13 @@ let lastCheckedDelivery;
 let hasPoapClaimed = false;
 // let hasPoapClaimedDisplayed = false;
 let hasRaffleDisplayed = false;
-function getAllDeliveries() {
+function getAllDeliveries(address) {
     return new Promise((resolve) => {
         allEvents = [];
         axios.get('https://frontend.poap.tech/deliveries?limit=1000&offset=0').then(res => {
             let events = [];
             if (lastCheckedDelivery != res.data.deliveries[0].id) {
-                window.localStorage.setItem('last_checked_delivery', res.data.deliveries[0].id);
+                window.localStorage.setItem(address, res.data.deliveries[0].id);
                 for (let event of res.data.deliveries) {
                     if (lastCheckedDelivery != event.id) {
                         events.push(event);
@@ -220,7 +220,7 @@ async function startRaffles(address) {
 
 }
 async function startDeliveries(address) {
-    let events = await getAllDeliveries();
+    let events = await getAllDeliveries(address);
     for (let event of events) {
         getMyDeliveries(event, address);
     }
@@ -235,7 +235,8 @@ $(document).ready(function () {
             $("#address").focus();
             return;
         }
-        lastCheckedDelivery = window.localStorage.getItem('last_checked_delivery');
+        lastCheckedDelivery = window.localStorage.getItem(address);
+        console.log(lastCheckedDelivery)
         $('#deliveriesHeader').html('');
         // $('#claimed').html('');
         $('#raffles').html('');
