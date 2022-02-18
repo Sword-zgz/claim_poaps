@@ -36,7 +36,7 @@ function isValidDelivery(slug) {
     })
 }
 
-function getAllRaffles(poaps, raffles = [], api = 'https://api-ro.poap.fun/api/v1/raffles/') {
+function getAllRaffles(poaps, raffles = [], api = 'https://anyplace-cors.herokuapp.com/https://api-ro.poap.fun/api/v1/raffles/') {
     return new Promise((resolve, reject) => {
         axios.get(api).then(res => {
             let page = res.data.next;
