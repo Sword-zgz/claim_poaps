@@ -1,4 +1,5 @@
 let allEvents = [];
+let lastCheckedDelivery;
 let hasPoapClaimed = false;
 // let hasPoapClaimedDisplayed = false;
 let hasRaffleDisplayed = false;
@@ -7,9 +8,16 @@ function getAllDeliveries() {
         allEvents = [];
         axios.get('https://frontend.poap.tech/deliveries?limit=1000&offset=0').then(res => {
             let events = [];
-            for (let event of res.data.deliveries) {
-                events.push(event);
-                allEvents.push(event.id);
+            if (lastCheckedDelivery != res.data.deliveries[0].id) {
+                window.localStorage.setItem('last_checked_delivery', res.data.deliveries[0].id);
+                for (let event of res.data.deliveries) {
+                    if (lastCheckedDelivery != event.id) {
+                        events.push(event);
+                        allEvents.push(event.id);
+                    } else {
+                        break;
+                    }
+                }
             }
             resolve(events)
         }).catch(err => {
@@ -206,9 +214,9 @@ function getMyDeliveries(event, address) {
 
 async function startRaffles(address) {
     let poaps = await getAllPoaps(address);
-    $('#checkRaffleMsg').html(`<p>Working hard to find the raffles you can join...</p>` );
+    $('#checkRaffleMsg').html(`<p>Working hard to find the raffles you can join...</p>`);
     await getAllRaffles(poaps);
-    $('#checkRaffleMsg').html(`` );
+    $('#checkRaffleMsg').html(``);
 
 }
 async function startDeliveries(address) {
@@ -227,13 +235,14 @@ $(document).ready(function () {
             $("#address").focus();
             return;
         }
+        lastCheckedDelivery = window.localStorage.getItem('last_checked_delivery');
         $('#deliveriesHeader').html('');
         // $('#claimed').html('');
         $('#raffles').html('');
         hasPoapClaimed = false;
         // hasPoapClaimedDisplayed = false;
         hasRaffleDisplayed = false;
-        $('#checkMsg').html(`<p>Checking...</p>`);
+        // $('#checkMsg').html(`<p>Checking...</p>`);
         startRaffles(address);
         startDeliveries(address);
     });
