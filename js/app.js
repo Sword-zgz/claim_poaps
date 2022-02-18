@@ -8,10 +8,10 @@ function getAllDeliveries(address) {
         allEvents = [];
         axios.get('https://frontend.poap.tech/deliveries?limit=1000&offset=0').then(res => {
             let events = [];
-            if (lastCheckedDelivery != res.data.deliveries[0].id) {
+            if (lastCheckedDelivery < res.data.deliveries[0].id) {
                 window.localStorage.setItem(address, res.data.deliveries[0].id);
                 for (let event of res.data.deliveries) {
-                    if (lastCheckedDelivery != event.id) {
+                    if (lastCheckedDelivery < event.id) {
                         events.push(event);
                         allEvents.push(event.id);
                     } else {
