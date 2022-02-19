@@ -1,7 +1,6 @@
 let allEvents = [];
 let lastCheckedDelivery;
 let hasPoapClaimed = false;
-// let hasPoapClaimedDisplayed = false;
 let hasRaffleDisplayed = false;
 function getAllDeliveries(address) {
     return new Promise((resolve) => {
@@ -56,7 +55,7 @@ function getAllRaffles(poaps, raffles = [], api = 'https://anyplace-cors.herokua
                         }
                     }
                 }
-                getAllRaffles(poaps, raffles, "https://anyplace-cors.herokuapp.com/"+page).then(resolve).catch(reject);;
+                getAllRaffles(poaps, raffles, "https://anyplace-cors.herokuapp.com/" + page).then(resolve).catch(reject);;
             } else {
                 resolve(true);
             }
@@ -181,34 +180,20 @@ function getMyDeliveries(event, address) {
                 }, 3000);
             }
         }
-        // else {
-        //     if (!hasPoapClaimedDisplayed) {
-        //         $('#claimed').html(`<div class="row mt-5">
-        //          <div class="col-md-12">
-        //              <div class="title-header text-center">
-        //                  <h5>Your Claimed POAP Deliveries</h5>
-        //              </div>
-        //          </div>
-        //      </div>
-        //      <div class="row" id="claimedDeliveries"></div>`)
-        //     }
-        //     document.getElementById('claimedDeliveries').innerHTML += `<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" style="opacity:0.5">
-        //             <div class="box-part text-center">
-        //             <span class="badge badge-primary">claimed</span>
-        //                 <a href="https://poap.delivery/${event.slug}">
-        //                     <img src="${event.image}" style="width:100px;height:100px;border-radius: 50%;">
-        //                 </a>
-        //                 <div class="title">
-        //                     <h4>${event.card_title}</h4>
-        //                 </div>
-        //                 <div id='${event.id}'></div>
-        //             </div>
-        //         </div>`;
-        //         hasPoapClaimedDisplayed = true;
-        // }
     }).catch(err => {
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
+        if(allEvents==0){
+            $('#deliveriesHeader').html(`<div class="row mt-5">
+            <div class="col-md-12">
+                <div class="title-header text-center">
+                    <h5>Your Availabe POAP Deliveries</h5>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <center><h5>No unclaimed POAPs found. Please check back next time.</h5></center>`);
+        }
     })
 }
 
@@ -221,6 +206,17 @@ async function startRaffles(address) {
 }
 async function startDeliveries(address) {
     let events = await getAllDeliveries(address);
+    if(events.length==0){
+        $('#deliveriesHeader').html(`<div class="row mt-5">
+            <div class="col-md-12">
+                <div class="title-header text-center">
+                    <h5>Your Availabe POAP Deliveries</h5>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <center><h5>No unclaimed POAPs found. Please check back next time.</h5></center>`);
+    }
     for (let event of events) {
         getMyDeliveries(event, address);
     }
@@ -236,14 +232,10 @@ $(document).ready(function () {
             return;
         }
         lastCheckedDelivery = window.localStorage.getItem(address);
-        console.log(lastCheckedDelivery)
         $('#deliveriesHeader').html('');
-        // $('#claimed').html('');
         $('#raffles').html('');
         hasPoapClaimed = false;
-        // hasPoapClaimedDisplayed = false;
         hasRaffleDisplayed = false;
-        // $('#checkMsg').html(`<p>Checking...</p>`);
         startRaffles(address);
         startDeliveries(address);
     });
