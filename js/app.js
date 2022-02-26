@@ -1,5 +1,6 @@
 let allEvents = [];
 let lastCheckedDelivery;
+const rollbackCheck = 20;
 let hasPoapClaimed = false;
 let hasRaffleDisplayed = false;
 function getAllDeliveries(address) {
@@ -7,10 +8,10 @@ function getAllDeliveries(address) {
         allEvents = [];
         axios.get('https://frontend.poap.tech/deliveries?limit=1000&offset=0').then(res => {
             let events = [];
-            if (lastCheckedDelivery < res.data.deliveries[0].id) {
+            if (lastCheckedDelivery - rollbackCheck < res.data.deliveries[0].id) {
                 window.localStorage.setItem(address, res.data.deliveries[0].id);
                 for (let event of res.data.deliveries) {
-                    if (lastCheckedDelivery < event.id) {
+                    if (lastCheckedDelivery - rollbackCheck < event.id) {
                         events.push(event);
                         allEvents.push(event.id);
                     } else {
@@ -183,7 +184,7 @@ function getMyDeliveries(event, address) {
     }).catch(err => {
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
-        if(allEvents==0){
+        if (allEvents == 0) {
             $('#deliveriesHeader').html(`<div class="row mt-5">
             <div class="col-md-12">
                 <div class="title-header text-center">
@@ -206,7 +207,7 @@ async function startRaffles(address) {
 }
 async function startDeliveries(address) {
     let events = await getAllDeliveries(address);
-    if(events.length==0){
+    if (events.length == 0) {
         $('#deliveriesHeader').html(`<div class="row mt-5">
             <div class="col-md-12">
                 <div class="title-header text-center">
