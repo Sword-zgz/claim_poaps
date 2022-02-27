@@ -3,15 +3,16 @@ let lastCheckedDelivery;
 const rollbackCheck = 20;
 let hasPoapClaimed = false;
 let hasRaffleDisplayed = false;
+let ifStartFromBeginning = false;
 function getAllDeliveries(address) {
     return new Promise((resolve) => {
         allEvents = [];
         axios.get('https://frontend.poap.tech/deliveries?limit=1000&offset=0').then(res => {
             let events = [];
-            if (lastCheckedDelivery - rollbackCheck < res.data.deliveries[0].id) {
+            if (lastCheckedDelivery < res.data.deliveries[0].id) {
                 window.localStorage.setItem(address, res.data.deliveries[0].id);
                 for (let event of res.data.deliveries) {
-                    if (lastCheckedDelivery - rollbackCheck < event.id) {
+                    if (lastCheckedDelivery < event.id) {
                         events.push(event);
                         allEvents.push(event.id);
                     } else {
@@ -224,6 +225,15 @@ async function startDeliveries(address) {
 }
 
 $(document).ready(function () {
+    $('input[type=checkbox][name="fromStart"]').change(function () {
+        if (this.checked) {
+            ifStartFromBeginning = true;
+
+        } else {
+            ifStartFromBeginning = false;
+
+        }
+    });
     $('#claimButton').submit(async function (e) {
         e.preventDefault();
         let address = $('#address').val().toLowerCase().trim();
@@ -232,7 +242,11 @@ $(document).ready(function () {
             $("#address").focus();
             return;
         }
-        lastCheckedDelivery = window.localStorage.getItem(address);
+        if (ifStartFromBeginning) {
+            lastCheckedDelivery = 0;
+        } else {
+            lastCheckedDelivery = window.localStorage.getItem(address)-rollbackCheck;
+        }
         $('#deliveriesHeader').html('');
         $('#raffles').html('');
         hasPoapClaimed = false;

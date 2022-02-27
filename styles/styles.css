@@ -43,14 +43,6 @@ body {
     position: relative;
 }
 
-.title-header:before {
-    border-top: 2px solid #4183D7;
-    content: "";
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 50%;
-}
 
 .title-header h5 {
     background: #fff;
