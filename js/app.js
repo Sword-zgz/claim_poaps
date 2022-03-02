@@ -185,7 +185,7 @@ function getMyDeliveries(event, address) {
     }).catch(err => {
         allEvents = allEvents.filter(item => item != event.id);
         $('#checkMsg').html(allEvents.length > 0 ? `<p>${allEvents.length} Deliveries Remaining to Check...</p>` : '');
-        if (allEvents == 0) {
+        if (allEvents.length==0 && !hasPoapClaimed) {
             $('#deliveriesHeader').html(`<div class="row mt-5">
             <div class="col-md-12">
                 <div class="title-header text-center">
